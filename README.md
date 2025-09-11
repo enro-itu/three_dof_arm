@@ -101,3 +101,81 @@
 ---
 
 **Deadline:** 1–3 days. Keep it small, stable, and well-documented.
+
+---
+
+## 12) CMake New Project Setup (quick-start)
+
+**Goal:** Create a fresh ROS 2 package using **ament_cmake** that holds your model, world, launch, and a Python control script.
+
+### A) Create the package skeleton
+```bash
+# In your workspace
+mkdir -p ~/arm_ws/src && cd ~/arm_ws/src
+ros2 pkg create arm3dof --build-type ament_cmake --dependencies rclpy std_msgs
+# Create folders you’ll need
+cd arm3dof
+mkdir -p models/arm3dof worlds launch src
+```
+
+### B) Minimal `CMakeLists.txt` (drop-in)
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(arm3dof)
+
+find_package(ament_cmake REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+
+# Install non-code assets (models/worlds/launch)
+install(DIRECTORY
+  models
+  worlds
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install Python scripts as executables
+install(PROGRAMS
+  src/move_demo.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_package()
+```
+
+### C) Minimal `package.xml` (essentials)
+```xml
+<?xml version="1.0"?>
+<package format="3">
+  <name>arm3dof</name>
+  <version>0.0.1</version>
+  <description>3-DOF arm with joint position control in Gazebo.</description>
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <!-- Needed at runtime to bridge ROS <-> Gazebo topics -->
+  <exec_depend>ros_gz_bridge</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+```
+
+### D) Make your Python script executable
+```bash
+chmod +x src/move_demo.py
+```
+
+### E) Build and source
+```bash
+cd ~/arm_ws
+colcon build
+source install/setup.bash
+```
+
+> **Tip:** Keep assets in-package (install via `share/${PROJECT_NAME}`) so fresh clones work without hard-coded paths.
