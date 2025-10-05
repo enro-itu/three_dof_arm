@@ -1,31 +1,18 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <sdf version="1.9">
   <model name="arm3dof">
     <static>false</static>
 
-    <!-- Base link -->
+    <!-- Base -->
     <link name="base_link">
       <pose>0 0 0 0 0 0</pose>
-
       <collision name="base_collision">
-        <geometry>
-          <box>
-            <size>0.3 0.3 0.1</size>
-          </box>
-        </geometry>
+        <geometry><box><size>0.3 0.3 0.1</size></box></geometry>
       </collision>
-
       <visual name="base_visual">
-        <geometry>
-          <box>
-            <size>0.3 0.3 0.1</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>0 0 1 1</ambient>
-        </material>
+        <geometry><box><size>0.3 0.3 0.1</size></box></geometry>
+        <material><ambient>0 0 1 1</ambient></material>
       </visual>
-
       <inertial>
         <mass>1.0</mass>
         <inertia>
@@ -38,26 +25,13 @@
     <!-- Shoulder link -->
     <link name="shoulder_link">
       <pose>0 0 0.1 0 0 0</pose>
-
       <collision name="shoulder_collision">
-        <geometry>
-          <box>
-            <size>0.1 0.1 0.4</size>
-          </box>
-        </geometry>
+        <geometry><box><size>0.1 0.1 0.4</size></box></geometry>
       </collision>
-
       <visual name="shoulder_visual">
-        <geometry>
-          <box>
-            <size>0.1 0.1 0.4</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>0 1 0 1</ambient>
-        </material>
+        <geometry><box><size>0.1 0.1 0.4</size></box></geometry>
+        <material><ambient>0 1 0 1</ambient></material>
       </visual>
-
       <inertial>
         <mass>0.5</mass>
         <inertia>
@@ -70,26 +44,13 @@
     <!-- Elbow link -->
     <link name="elbow_link">
       <pose>0 0 0.5 0 0 0</pose>
-
       <collision name="elbow_collision">
-        <geometry>
-          <box>
-            <size>0.1 0.1 0.3</size>
-          </box>
-        </geometry>
+        <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
       </collision>
-
       <visual name="elbow_visual">
-        <geometry>
-          <box>
-            <size>0.1 0.1 0.3</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>1 0 0 1</ambient>
-        </material>
+        <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
+        <material><ambient>1 0 0 1</ambient></material>
       </visual>
-
       <inertial>
         <mass>0.3</mass>
         <inertia>
@@ -99,57 +60,69 @@
       </inertial>
     </link>
 
-    <!-- Joint: base → shoulder -->
+    <!-- Wrist link (3rd DOF) -->
+    <link name="wrist_link">
+      <pose>0 0 0.8 0 0 0</pose>
+      <collision name="wrist_collision">
+        <geometry><box><size>0.08 0.08 0.2</size></box></geometry>
+      </collision>
+      <visual name="wrist_visual">
+        <geometry><box><size>0.08 0.08 0.2</size></box></geometry>
+        <material><ambient>1 1 0 1</ambient></material>
+      </visual>
+      <inertial>
+        <mass>0.2</mass>
+        <inertia>
+          <ixx>0.002</ixx><iyy>0.002</iyy><izz>0.002</izz>
+          <ixy>0.0</ixy><ixz>0.0</ixz><iyz>0.0</iyz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <!-- Joint: base → shoulder (yaw around Z) -->
     <joint name="j1_base_yaw" type="revolute">
       <parent>base_link</parent>
       <child>shoulder_link</child>
+      <pose>0 0 0.05 0 0 0</pose>
       <axis>
         <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-3.14</lower>
-          <upper>3.14</upper>
-        </limit>
-        <dynamics>
-          <damping>0.1</damping>
-        </dynamics>
+        <limit><lower>-3.14</lower><upper>3.14</upper></limit>
+        <dynamics><damping>0.1</damping></dynamics>
       </axis>
     </joint>
 
-    <!-- Joint: shoulder → elbow -->
+    <!-- Joint: shoulder → elbow (pitch around Y) -->
     <joint name="j2_shoulder" type="revolute">
       <parent>shoulder_link</parent>
       <child>elbow_link</child>
+      <pose>0 0 0.2 0 0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.57</lower>
-          <upper>1.57</upper>
-        </limit>
-        <dynamics>
-          <damping>0.05</damping>
-        </dynamics>
+        <limit><lower>-1.57</lower><upper>1.57</upper></limit>
+        <dynamics><damping>0.05</damping></dynamics>
       </axis>
     </joint>
-<!-- ROS 2 joint state publisher -->
-    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-      <ros>
-        <namespace>/arm</namespace>
-      </ros>
-      <update_rate>50</update_rate>
-    </plugin>
 
-    <!-- ROS 2 joint position controller -->
-    <plugin name="joint_position_controller" filename="libgazebo_ros_joint_position_controller.so">
+    <!-- Joint: elbow → wrist (pitch around Y) -->
+    <joint name="j3_elbow" type="revolute">
+      <parent>elbow_link</parent>
+      <child>wrist_link</child>
+      <pose>0 0 0.15 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.57</lower><upper>1.57</upper></limit>
+        <dynamics><damping>0.05</damping></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Correct control bridge for Gazebo Sim -->
+    <plugin name="gz_ros2_control" filename="libgz_ros2_control-system.so">
+      <!-- Path can be absolute or relative to this SDF file -->
+      <parameters>config/ros2_control.yaml</parameters>
+      <!-- Optional namespace:
       <ros>
         <namespace>/arm</namespace>
-      </ros>
-      <joints>
-        <joint>j1_base_yaw</joint>
-        <joint>j2_shoulder</joint>
-        <joint>j3_elbow</joint>
-      </joints>
+      </ros> -->
     </plugin>
   </model>
 </sdf>
-
-
