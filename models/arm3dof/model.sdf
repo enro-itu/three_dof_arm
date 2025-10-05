@@ -49,7 +49,7 @@
       </collision>
       <visual name="elbow_visual">
         <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
-        <material><ambient>1 0 0 1</material>
+        <material><ambient>1 0 0 1</ambient></material>
       </visual>
       <inertial>
         <mass>0.3</mass>
