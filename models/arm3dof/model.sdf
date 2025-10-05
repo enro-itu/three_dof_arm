@@ -22,7 +22,7 @@
       </inertial>
     </link>
 
-    <!-- Shoulder link -->
+    <!-- Shoulder -->
     <link name="shoulder_link">
       <pose>0 0 0.1 0 0 0</pose>
       <collision name="shoulder_collision">
@@ -41,7 +41,7 @@
       </inertial>
     </link>
 
-    <!-- Elbow link -->
+    <!-- Elbow -->
     <link name="elbow_link">
       <pose>0 0 0.5 0 0 0</pose>
       <collision name="elbow_collision">
@@ -49,7 +49,7 @@
       </collision>
       <visual name="elbow_visual">
         <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
-        <material><ambient>1 0 0 1</ambient></material>
+        <material><ambient>1 0 0 1</material>
       </visual>
       <inertial>
         <mass>0.3</mass>
@@ -60,7 +60,7 @@
       </inertial>
     </link>
 
-    <!-- Wrist link (3rd DOF) -->
+    <!-- Wrist -->
     <link name="wrist_link">
       <pose>0 0 0.8 0 0 0</pose>
       <collision name="wrist_collision">
@@ -79,7 +79,7 @@
       </inertial>
     </link>
 
-    <!-- Joint: base → shoulder (yaw around Z) -->
+    <!-- Joints -->
     <joint name="j1_base_yaw" type="revolute">
       <parent>base_link</parent>
       <child>shoulder_link</child>
@@ -91,7 +91,6 @@
       </axis>
     </joint>
 
-    <!-- Joint: shoulder → elbow (pitch around Y) -->
     <joint name="j2_shoulder" type="revolute">
       <parent>shoulder_link</parent>
       <child>elbow_link</child>
@@ -103,7 +102,6 @@
       </axis>
     </joint>
 
-    <!-- Joint: elbow → wrist (pitch around Y) -->
     <joint name="j3_elbow" type="revolute">
       <parent>elbow_link</parent>
       <child>wrist_link</child>
@@ -115,14 +113,12 @@
       </axis>
     </joint>
 
-    <!-- Correct control bridge for Gazebo Sim -->
+    <!-- Correct Gazebo Sim ↔ ros2_control bridge -->
     <plugin name="gz_ros2_control" filename="libgz_ros2_control-system.so">
-      <!-- Path can be absolute or relative to this SDF file -->
-      <parameters>config/ros2_control.yaml</parameters>
+      <!-- relative to this model.sdf -->
+      <parameters>../../config/ros2_control.yaml</parameters>
       <!-- Optional namespace:
-      <ros>
-        <namespace>/arm</namespace>
-      </ros> -->
+      <ros><namespace>/arm</namespace></ros> -->
     </plugin>
   </model>
 </sdf>

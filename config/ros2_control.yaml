@@ -1,0 +1,28 @@
+# Gazebo Sim ros2_control configuration for arm3dof
+ros2_control:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+
+    arm_hw:
+      hardware:
+        plugin: gz_ros2_control/GazeboSystem
+      joints:
+        - j1_base_yaw
+        - j2_shoulder
+        - j3_elbow
+      command_interfaces: [position]
+      state_interfaces: [position, velocity]
+
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # Single group controller -> topic: /arm_position_controller/commands (Float64MultiArray)
+    arm_position_controller:
+      type: forward_command_controller/ForwardCommandController
+      joints: [j1_base_yaw, j2_shoulder, j3_elbow]
+      interface_name: position
